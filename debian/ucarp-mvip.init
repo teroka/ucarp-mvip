@@ -102,7 +102,6 @@ start() {
 	    echo "OK"
     else
 	    echo "FAIL"
-	    exit 1
     fi
 }
 
@@ -113,10 +112,13 @@ stop() {
 
     [ ! -z "${FILES}" ] && \
     for FILE in ${FILES}; do
+        ID=`echo ${FILE}| sed 's/^vip-\(.*\).conf/\1/'`
 
         # Source ucarp settings
         . /etc/ucarp-mvip/${FILE}
-        start-stop-daemon --stop --pidfile /var/run/ucarp.${ID} --exec /usr/sbin/ucarp
+            start-stop-daemon --stop --pidfile /var/run/ucarp.${ID} --exec /usr/sbin/ucarp -- \
+		    -v ${ID} -p ${PASSWORD} -s ${BIND_ADDRESS} -a ${VIP_ADDRESS} -i ${VIP_INTERFACE} ${OPTIONS} \
+		    -B --upscript=/usr/share/ucarp-mvip/vip-up --downscript=/usr/share/ucarp-mvip/vip-down
 
         # Check that we have the ifcfg-<if> file for the virtual interface
         if /sbin/ifconfig ${VIP_INTERFACE} down >/dev/null 2>&1; then
@@ -125,8 +127,11 @@ stop() {
             logger $INITLOG_ARGS -t carp $"bringing down carp managed interface ${VIP_INTERFACE}:"
         fi
     done
-    echo
-    [ "$RETVAL" -eq 0 ] && echo ;
+    if [ "$RETVAL" -eq 0 ]; then
+	    echo "OK"
+    else
+	    echo "FAIL"
+    fi
 }
 
 # See how we were called.
