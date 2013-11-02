@@ -89,7 +89,7 @@ start() {
             fi
             start-stop-daemon --start --pidfile /var/run/ucarp.${ID} --make-pidfile --background --exec /usr/sbin/ucarp -- \
 		    -v ${ID} -p ${PASSWORD} -s ${BIND_ADDRESS} -a ${VIP_ADDRESS} -i ${VIP_INTERFACE} ${OPTIONS} \
-		    -B --upscript=/usr/share/ucarp-mvip/vip-up --downscript=/usr/share/ucarp-mvip/vip-down
+		    --upscript=/usr/share/ucarp-mvip/vip-up --downscript=/usr/share/ucarp-mvip/vip-down
             LAUNCH_RETVAL=$?
             [ ${LAUNCH_RETVAL} -ne 0 ] && RETVAL=1
         done
@@ -116,9 +116,9 @@ stop() {
 
         # Source ucarp settings
         . /etc/ucarp-mvip/${FILE}
-            start-stop-daemon --stop --pidfile /var/run/ucarp.${ID} --exec /usr/sbin/ucarp -- \
-		    -v ${ID} -p ${PASSWORD} -s ${BIND_ADDRESS} -a ${VIP_ADDRESS} -i ${VIP_INTERFACE} ${OPTIONS} \
-		    -B --upscript=/usr/share/ucarp-mvip/vip-up --downscript=/usr/share/ucarp-mvip/vip-down
+        start-stop-daemon --stop --pidfile /var/run/ucarp.${ID} --exec /usr/sbin/ucarp -- \
+	    -v ${ID} -p ${PASSWORD} -s ${BIND_ADDRESS} -a ${VIP_ADDRESS} -i ${VIP_INTERFACE} ${OPTIONS} \
+	    --upscript=/usr/share/ucarp-mvip/vip-up --downscript=/usr/share/ucarp-mvip/vip-down
 
         # Check that we have the ifcfg-<if> file for the virtual interface
         if /sbin/ifconfig ${VIP_INTERFACE} down >/dev/null 2>&1; then
