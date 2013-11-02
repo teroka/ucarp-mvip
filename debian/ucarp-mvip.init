@@ -1,0 +1,144 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:          ucarp-mvip
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start ucarp interfaces
+# Description:       Start ucarp interfaces that's configured in /etc/ucarp-mvip
+### END INIT INFO
+
+# Author: Tero Kantonen <prkele@gmail.com>
+
+
+[ -x /sbin/ifup ] || exit 0
+[ -x /sbin/ifdown ] || exit 0
+
+# Source function library.
+. /lib/lsb/init-functions
+
+# Load the VERBOSE setting and other rcS variables
+. /lib/init/vars.sh
+
+NAME=ucarp-mvip
+
+# Read configuration variable file if it is present
+[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
+if [ ${UCARP_MVIP_ENABLED} = "no" ]; then
+	exit 0
+fi
+
+CONFIGURE_INTERFACES=yes
+EXCLUDE_INTERFACES=
+VERBOSE=no
+
+[ -f /etc/default/networking ] && . /etc/default/networking
+
+[ "$VERBOSE" = yes ] && verbose=-v
+
+
+# Check that networking is up.
+[ ${CONFIGURE_INTERFACES} = "no" ] && exit 0
+
+get_files() {
+    FILES=`find /etc/ucarp-mvip/ -maxdepth 1 -type f -name 'vip-*.conf' \
+           -printf "%f\n" | LC_COLLATE="C" sort`
+}
+
+prog=$"common address redundancy protocol daemon"
+RETVAL=0
+
+start() {
+    echo -n $"Starting ${prog}: "
+
+    get_files
+
+    if [ -z "${FILES}" ]; then
+        failure $"no virtual addresses are configured in /etc/ucarp-mvip"
+        RETVAL=1
+    else
+        for FILE in ${FILES}; do
+            # Check that the file name gives us an ID between 1 and 255
+            ID=`echo ${FILE}| sed 's/^vip-\(.*\).conf/\1/'`
+            if [ ${ID} -lt 1 -o ${ID} -gt 255 ]; then
+                logger $INITLOG_ARGS -t carp "configuration file name ${FILE} gave us a bad ID of ${ID}:"
+                RETVAL=1
+                break
+            fi
+
+            # Source ucarp settings
+            . /etc/ucarp-mvip/${FILE}
+
+            BIND_ADDRESS="`ifconfig ${BIND_INTERFACE} | sed -n 's/.*inet addr:\([^ ]*\) .*/\1/p' | head -n 1`"
+            if [ -z "${BIND_ADDRESS}" ]; then
+                logger $INITLOG_ARGS -t carp $"no IPADDR set for ${BIND_INTERFACE}:"
+                RETVAL=1
+                break
+            fi
+
+	    VIP_ADDRESS=$(ifquery ${VIP_INTERFACE}| awk '/address/ { print $NF }')
+	    
+            if [ -z "${VIP_ADDRESS}" ]; then
+                logger $INITLOG_ARGS -t carp "no address found for ${VIP_INTERFACE} in /etc/network/interfaces"
+                RETVAL=1
+                break
+            fi
+            start-stop-daemon --start --pidfile /var/run/ucarp.${ID} --make-pidfile --background --exec /usr/sbin/ucarp -- \
+		    -v ${ID} -p ${PASSWORD} -s ${BIND_ADDRESS} -a ${VIP_ADDRESS} -i ${VIP_INTERFACE} ${OPTIONS} \
+		    -B --upscript=/usr/share/ucarp-mvip/vip-up --downscript=/usr/share/ucarp-mvip/vip-down
+            LAUNCH_RETVAL=$?
+            [ ${LAUNCH_RETVAL} -ne 0 ] && RETVAL=1
+        done
+        [ "${RETVAL}" -ne 0 ] && failure $"error in one or more of the carp configurations, see above:"
+    fi
+    echo
+    [ "$RETVAL" -eq 0 ] && echo ;
+}
+
+stop() {
+    echo -n $"Shutting down $prog: "
+
+    get_files
+
+    [ ! -z "${FILES}" ] && \
+    for FILE in ${FILES}; do
+
+        # Source ucarp settings
+        . /etc/ucarp-mvip/${FILE}
+        start-stop-daemon --stop --pidfile /var/run/ucarp.${ID} --exec /usr/sbin/ucarp
+
+        # Check that we have the ifcfg-<if> file for the virtual interface
+        if /sbin/ifconfig ${VIP_INTERFACE} down >/dev/null 2>&1; then
+            logger $INITLOG_ARGS -t carp $"bringing down carp managed interface ${VIP_INTERFACE}:"
+        else
+            logger $INITLOG_ARGS -t carp $"bringing down carp managed interface ${VIP_INTERFACE}:"
+        fi
+    done
+    echo
+    [ "$RETVAL" -eq 0 ] && echo ;
+}
+
+# See how we were called.
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|force-reload)
+	stop
+	start
+	;;
+  status)
+	status_of_proc "/usr/sbin/ucarp" "ucarp" && exit 0 || exit $?
+	;;
+  *)
+	echo $"Usage: $0 {start|stop|restart|condrestart|status}"
+	exit 1
+esac
+
+exit $RETVAL

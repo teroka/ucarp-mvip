@@ -1,0 +1,9 @@
+#!/bin/sh
+IPADDRESS=$(ifquery ${1}| awk '/address/ { print $NF }')
+NETMASK=$(ifquery ${1}| awk '/netmask/ { print $NF }')
+#exec /sbin/ip addr add ${IPADDR}/${NETMASK} dev "$1"
+
+# We could use ifup directly, but it complains if the address is already used
+#/sbin/ifup $1
+
+exec /sbin/ifconfig $1 ${IPADDRESS} netmask ${NETMASK} up

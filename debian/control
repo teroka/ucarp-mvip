@@ -1,0 +1,14 @@
+Source: ucarp-mvip
+Maintainer: Tero Kantonen <prkele@gmail.com>
+Section: net
+Priority: optional
+Standards-Version: 3.9.2
+Build-Depends: debhelper (>= 8)
+
+Package: ucarp-mvip
+Architecture: all
+Depends: ${misc:Depends}, ucarp
+Description: Adds CentOS like multiple vip configuration options for ucarp
+  Default debian ucarp doesn't support additional vip's in the same interface.
+  This will remedy that, and you can set them in /etc/ucarp-mvip/
+
