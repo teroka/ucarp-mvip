@@ -27,7 +27,8 @@ NAME=ucarp-mvip
 # Read configuration variable file if it is present
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
 
-if [ ${UCARP_MVIP_ENABLED} = "no" ]; then
+
+if [ "${UCARP_MVIP_ENABLED}" = "no" ]; then
 	exit 0
 fi
 
@@ -57,7 +58,7 @@ start() {
     get_files
 
     if [ -z "${FILES}" ]; then
-        failure $"no virtual addresses are configured in /etc/ucarp-mvip"
+        echo $"no virtual addresses are configured in /etc/ucarp-mvip"
         RETVAL=1
     else
         for FILE in ${FILES}; do
@@ -92,10 +93,17 @@ start() {
             LAUNCH_RETVAL=$?
             [ ${LAUNCH_RETVAL} -ne 0 ] && RETVAL=1
         done
-        [ "${RETVAL}" -ne 0 ] && failure $"error in one or more of the carp configurations, see above:"
+        if [ "${RETVAL}" -ne 0 ]; then
+		echo "error in one or more of the carp configurations, see above:"
+		exit 1
+	fi
     fi
-    echo
-    [ "$RETVAL" -eq 0 ] && echo ;
+    if [ "$RETVAL" -eq 0 ]; then
+	    echo "OK"
+    else
+	    echo "FAIL"
+	    exit 1
+    fi
 }
 
 stop() {
