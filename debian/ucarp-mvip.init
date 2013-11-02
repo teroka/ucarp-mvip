@@ -29,7 +29,7 @@ NAME=ucarp-mvip
 
 
 if [ "${UCARP_MVIP_ENABLED}" = "no" ]; then
-	exit 0
+    exit 0
 fi
 
 CONFIGURE_INTERFACES=yes
@@ -65,7 +65,7 @@ start() {
             # Check that the file name gives us an ID between 1 and 255
             ID=`echo ${FILE}| sed 's/^vip-\(.*\).conf/\1/'`
             if [ ${ID} -lt 1 -o ${ID} -gt 255 ]; then
-                logger $INITLOG_ARGS -t carp "configuration file name ${FILE} gave us a bad ID of ${ID}:"
+                logger -t carp "configuration file name ${FILE} gave us a bad ID of ${ID}:"
                 RETVAL=1
                 break
             fi
@@ -75,33 +75,33 @@ start() {
 
             BIND_ADDRESS="`ifconfig ${BIND_INTERFACE} | sed -n 's/.*inet addr:\([^ ]*\) .*/\1/p' | head -n 1`"
             if [ -z "${BIND_ADDRESS}" ]; then
-                logger $INITLOG_ARGS -t carp $"no IPADDR set for ${BIND_INTERFACE}:"
+                logger -t carp $"no IPADDR set for ${BIND_INTERFACE}:"
                 RETVAL=1
                 break
             fi
 
-	    VIP_ADDRESS=$(ifquery ${VIP_INTERFACE}| awk '/address/ { print $NF }')
-	    
+        VIP_ADDRESS=$(ifquery ${VIP_INTERFACE}| awk '/address/ { print $NF }')
+        
             if [ -z "${VIP_ADDRESS}" ]; then
-                logger $INITLOG_ARGS -t carp "no address found for ${VIP_INTERFACE} in /etc/network/interfaces"
+                logger -t carp "no address found for ${VIP_INTERFACE} in /etc/network/interfaces"
                 RETVAL=1
                 break
             fi
             start-stop-daemon --start --pidfile /var/run/ucarp.${ID} --make-pidfile --background --exec /usr/sbin/ucarp -- \
-		    -v ${ID} -p ${PASSWORD} -s ${BIND_ADDRESS} -a ${VIP_ADDRESS} -i ${VIP_INTERFACE} ${OPTIONS} \
-		    --upscript=/usr/share/ucarp-mvip/vip-up --downscript=/usr/share/ucarp-mvip/vip-down
+            -v ${ID} -p ${PASSWORD} -s ${BIND_ADDRESS} -a ${VIP_ADDRESS} -i ${VIP_INTERFACE} ${OPTIONS} \
+            --upscript=/usr/share/ucarp-mvip/vip-up --downscript=/usr/share/ucarp-mvip/vip-down
             LAUNCH_RETVAL=$?
             [ ${LAUNCH_RETVAL} -ne 0 ] && RETVAL=1
         done
         if [ "${RETVAL}" -ne 0 ]; then
-		echo "error in one or more of the carp configurations, see above:"
-		exit 1
-	fi
+        echo "error in one or more of the carp configurations, see above:"
+        exit 1
+    fi
     fi
     if [ "$RETVAL" -eq 0 ]; then
-	    echo "OK"
+        echo "OK"
     else
-	    echo "FAIL"
+        echo "FAIL"
     fi
 }
 
@@ -117,41 +117,41 @@ stop() {
         # Source ucarp settings
         . /etc/ucarp-mvip/${FILE}
         start-stop-daemon --stop --pidfile /var/run/ucarp.${ID} --exec /usr/sbin/ucarp -- \
-	    -v ${ID} -p ${PASSWORD} -s ${BIND_ADDRESS} -a ${VIP_ADDRESS} -i ${VIP_INTERFACE} ${OPTIONS} \
-	    --upscript=/usr/share/ucarp-mvip/vip-up --downscript=/usr/share/ucarp-mvip/vip-down
+        -v ${ID} -p ${PASSWORD} -s ${BIND_ADDRESS} -a ${VIP_ADDRESS} -i ${VIP_INTERFACE} ${OPTIONS} \
+        --upscript=/usr/share/ucarp-mvip/vip-up --downscript=/usr/share/ucarp-mvip/vip-down
 
         # Check that we have the ifcfg-<if> file for the virtual interface
         if /sbin/ifconfig ${VIP_INTERFACE} down >/dev/null 2>&1; then
-            logger $INITLOG_ARGS -t carp $"bringing down carp managed interface ${VIP_INTERFACE}:"
+            logger -t carp $"bringing down carp managed interface ${VIP_INTERFACE}:"
         else
-            logger $INITLOG_ARGS -t carp $"bringing down carp managed interface ${VIP_INTERFACE}:"
+            logger -t carp $"bringing down carp managed interface ${VIP_INTERFACE}:"
         fi
     done
     if [ "$RETVAL" -eq 0 ]; then
-	    echo "OK"
+        echo "OK"
     else
-	    echo "FAIL"
+        echo "FAIL"
     fi
 }
 
 # See how we were called.
 case "$1" in
   start)
-	start
-	;;
+    start
+    ;;
   stop)
-	stop
-	;;
+    stop
+    ;;
   restart|force-reload)
-	stop
-	start
-	;;
+    stop
+    start
+    ;;
   status)
-	status_of_proc "/usr/sbin/ucarp" "ucarp" && exit 0 || exit $?
-	;;
+    status_of_proc "/usr/sbin/ucarp" "ucarp" && exit 0 || exit $?
+    ;;
   *)
-	echo $"Usage: $0 {start|stop|restart|condrestart|status}"
-	exit 1
+    echo $"Usage: $0 {start|stop|restart|condrestart|status}"
+    exit 1
 esac
 
 exit $RETVAL
