@@ -80,7 +80,7 @@ start() {
                 break
             fi
 
-        VIP_ADDRESS=$(ifquery ${VIP_INTERFACE}| awk '/address/ { print $NF }')
+            VIP_ADDRESS=$(awk -v i=${VIP_INTERFACE} -v p=address -f /usr/share/ucarp-mvip/parseinterfaces.awk /etc/network/interfaces)
         
             if [ -z "${VIP_ADDRESS}" ]; then
                 logger -t carp "no address found for ${VIP_INTERFACE} in /etc/network/interfaces"

@@ -20,22 +20,19 @@ TLDR; `dpkg-buildpackage -us -uc -b`
 Configure your carp interfaces in `/etc/network/interfaces` as such:
 
 ```
-  auto eth0:carp0
   iface eth0:carp0 inet static
         address 192.168.1.110
         netmask 255.255.255.0
 
-  auto eth0:carp1
   iface eth0:carp1 inet static
         address 192.168.1.120
         netmask 255.255.255.0
 ```
 
 Then copy vip example from `/usr/doc/ucarp-mvip/examples/` to `/etc/ucarp-mvip/`
-and configure them as you please. Don't forget to `auto` the carp interfaces
-as we're lazily using `ifquery`.
+and configure them as you please. 
 
-Vip config examples for **one** server using the above `/etc/network/interfaces`
+Vip config examples for **first** server using the above `/etc/network/interfaces`
 example could look like:
 * `/etc/ucarp-mvip/vip-010.conf`
 

@@ -1,6 +1,6 @@
 #!/bin/sh
-IPADDRESS=$(ifquery ${1}| awk '/address/ { print $NF }')
-NETMASK=$(ifquery ${1}| awk '/netmask/ { print $NF }')
+IPADDRESS=$(awk -v i=${1} -v p=address -f /usr/share/ucarp-mvip/parseinterfaces.awk /etc/network/interfaces)
+NETMASK=$(awk -v i=${1} -v p=netmask -f /usr/share/ucarp-mvip/arseinterfaces.awk /etc/network/interfaces)
 #exec /sbin/ip addr add ${IPADDR}/${NETMASK} dev "$1"
 
 # We could use ifup directly, but it complains if the address is already used

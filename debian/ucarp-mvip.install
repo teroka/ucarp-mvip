@@ -1,2 +1,3 @@
 vip-down usr/share/ucarp-mvip
 vip-up usr/share/ucarp-mvip
+parseinterfaces.awk usr/share/ucarp-mvip

@@ -1,6 +1,7 @@
-ucarp-mvip (1.0~dev2) UNRELEASED; urgency=low
+ucarp-mvip (1.0~dev3) UNRELEASED; urgency=low
 
   * Initial release.
-  * Fixed start-stop-deamon so it writes correct pids
+  * Fixed start-stop-deamon so it writes correct pids.
+  * Refactor out ifquery usage as it required 'auto' mode interfaces.
 
- -- Tero Kantonen <prkele@gmail.com>  Sat, 02 Nov 2013 21:36:33 +0200
+ -- Tero Kantonen <prkele@gmail.com>  Sat, 02 Nov 2013 23:58:06 +0200
