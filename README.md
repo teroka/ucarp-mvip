@@ -1,12 +1,12 @@
 ucarp-mvip
 ==========
 
-Helper to get multiple vips up under one interface with Debian's ucarp.
-This is straight up grabbed from CentOS and crudely hacked to work within
-Debian.
+`ucarp-mvip` is a helper package on top of [ucarp](http://www.ucarp.org/) to get
+multiple vips up under one interface with Debian's ucarp. This is straight up 
+grabbed from CentOS and crudely hacked to work within Debian.
 
 ### Why whould I use this?
-You shouldn't, no guarantees here. But if you do, you're probaly annoyed that
+You shouldn't, no guarantees here. But if you do, you're probably annoyed that
 there's no convenient way to do this in Debian. Seeing the CentOS way of doing
 the VIP's, I wanted it in my Debian too. So might you.
 
@@ -17,7 +17,8 @@ TLDR; `dpkg-buildpackage -us -uc -b`
 
 ### Usage
 
-Configure your carp interfaces in `/etc/network/interfaces` as such:
+First enable the `ucarp-mvip` from `/etc/defaults/ucarp-mvip`.
+Then configure your carp interfaces in `/etc/network/interfaces` as such:
 
 ```
   iface eth0:carp0 inet static
@@ -32,7 +33,7 @@ Configure your carp interfaces in `/etc/network/interfaces` as such:
 Then copy vip example from `/usr/doc/ucarp-mvip/examples/` to `/etc/ucarp-mvip/`
 and configure them as you please. 
 
-Vip config examples for **first** server using the above `/etc/network/interfaces`
+Vip configs for your **first** server using the above `/etc/network/interfaces`
 example could look like:
 * `/etc/ucarp-mvip/vip-010.conf`
 
@@ -71,3 +72,5 @@ BIND_INTERFACE="eth0"
 VIP_INTERFACE="eth0:carp1"
 OPTIONS="-k 1 -P -n"
 ```
+
+Then restart the `ucarp-mvip`: `/etc/init.d/ucarp-mvip restart`
