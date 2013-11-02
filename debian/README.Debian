@@ -16,6 +16,7 @@ Configure your carp interfaces in /etc/network/interfaces as such:
         netmask 255.255.255.0
 
 Then copy vip example from /usr/doc/ucarp-mvip/examples/ to /etc/ucarp-mvip/
-and configure them as you please.
+and configure them as you please. Don't forget to 'auto' the carp interfaces
+as we're lazily using ifquery.
 
  -- Tero Kantonen <prkele@gmail.com>
