@@ -1,0 +1,21 @@
+ucarp-mvip
+-----------------
+This is a sort-of-ported from CentOS ucarp package.
+The Debian ucarp is unable to natively handle multiple vips in one interface.
+
+Configure your carp interfaces in /etc/network/interfaces as such:
+
+  auto eth0:carp0
+  iface eth0:carp0 inet static
+        address 192.168.1.110
+        netmask 255.255.255.0
+
+  auto eth0:carp1
+  iface eth0:carp1 inet static
+        address 192.168.1.120
+        netmask 255.255.255.0
+
+Then copy vip example from /usr/doc/ucarp-mvip/examples/ to /etc/ucarp-mvip/
+and configure them as you please.
+
+ -- Tero Kantonen <prkele@gmail.com>
