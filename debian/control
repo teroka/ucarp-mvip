@@ -4,6 +4,7 @@ Section: net
 Priority: optional
 Standards-Version: 3.9.2
 Build-Depends: debhelper (>= 8)
+Homepage: https://github.com/teroka/ucarp-mvip
 
 Package: ucarp-mvip
 Architecture: all
