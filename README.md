@@ -73,4 +73,14 @@ VIP_INTERFACE="eth0:carp1"
 OPTIONS="-k 1 -P -n"
 ```
 
-Then restart the `ucarp-mvip`: `/etc/init.d/ucarp-mvip restart`
+Then restart the `ucarp-mvip`: `/etc/init.d/ucarp-mvip restart`.
+
+You also might want to add additional `post-up` option to your `interfaces`.
+It's optional, so YMMV:
+```
+iface eth0 inet static
+        address 192.168.1.111
+        netmask 255.255.255.0
+        gateway 192.168.1.1
+        post-up /etc/init.d/ucarp-mvip start
+```

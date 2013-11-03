@@ -1,5 +1,5 @@
-ucarp-mvip
------------------
+ucarp-mvip || https://github.com/teroka/ucarp-mvip
+--------------------------------------------------
 This is a sort-of-ported from CentOS ucarp package.
 The Debian ucarp is unable to natively handle multiple vips in one interface.
 
@@ -15,5 +15,14 @@ Configure your carp interfaces in /etc/network/interfaces as such:
 
 Then copy vip example from /usr/doc/ucarp-mvip/examples/ to /etc/ucarp-mvip/
 and configure them as you please.
+
+You also might want to add additional 'post-up' option to your 
+interfaces. It's optional, so YMMV:
+
+  iface eth0 inet static
+        address 192.168.1.111
+        netmask 255.255.255.0
+        gateway 192.168.1.1
+        post-up /etc/init.d/ucarp-mvip start
 
  -- Tero Kantonen <prkele@gmail.com>
