@@ -2,13 +2,13 @@ ucarp-mvip
 ==========
 
 `ucarp-mvip` is a helper package on top of [ucarp](http://www.ucarp.org/) to get
-multiple vips up under one interface with Debian's ucarp. This is straight up 
-grabbed from CentOS and crudely hacked to work within Debian.
+multiple vips up under one interface with Debian's ucarp package. This is
+straight up grabbed from CentOS and hacked to work within Debian.
 
 ### Why whould I use this?
 You shouldn't, no guarantees here. But if you do, you're probably annoyed that
 there's no convenient way to do this in Debian. Seeing the CentOS way of doing
-the VIP's, I wanted it in my Debian too. So might you.
+the VIP's, I wanted it in my Debian too. As might you.
 
 ### Building The Package
 http://www.debian.org/doc/manuals/maint-guide/build.en.html
@@ -17,7 +17,7 @@ TLDR; `dpkg-buildpackage -us -uc -b`
 
 ### Usage
 
-First enable the `ucarp-mvip` from `/etc/defaults/ucarp-mvip`.
+First enable the `ucarp-mvip` from `/etc/default/ucarp-mvip`.
 Then configure your carp interfaces in `/etc/network/interfaces` as such:
 
 ```
